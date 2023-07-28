@@ -20,10 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $nome = $_POST["nome"];
         $email = $_POST["email"];
         $relato = $_POST["relato"];
-
-      //  if /// (se anonimo)
-      //    $email = NULL; $nome = NULL;
-
+        
         // Gera o ID único usando a função generateUniqueId()
         $id = generateUniqueId();
 

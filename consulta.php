@@ -25,6 +25,7 @@
             padding: 20px;
             max-width: 600px;
             width: 80%;
+            margin-top: 1%;
             overflow-y: auto;
         }
 
@@ -84,6 +85,25 @@
             color:green;
             font-weight: bold; 
         }
+
+        /* Style the scrollbar */
+        ::-webkit-scrollbar {
+        width: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #00acc1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #1d1d1d;
+        }
+
+        ::-webkit-scrollbar-track {
+            background-color: #fff;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
@@ -109,10 +129,14 @@
                     $relatoTexto = $relato['relato'];
                     $resposta = $relato['resposta'];
 
+                    // Convertendo o timestamp para formato de data e hora legíveis
+                    $dataCriacao = date("d/m/Y H:i", strtotime($relato['data_criacao']));
+
                     echo "<hr>";
                     echo "<p><span class='variable'>ID do relato:</span> $relatoId</p>";
                     echo "<p><span class='variable'>Nome do usuário:</span> $nomeUsuario</p>";
                     echo "<p><span class='variable'>Email do usuário:</span> $emailUsuario</p>";
+                    echo "<p><span class='variable'>Data e Hora do relato:</span> $dataCriacao</p>";
                     echo "<hr>";
                     echo "<p><span class='relato'>Relato:</span></p>";
                     echo "<p>$relatoTexto</p>";
@@ -122,7 +146,7 @@
                         echo "<p><span class='respostaRelato'>Resposta do relato:</span></p>";
                         echo "<p>$resposta</p>";
                     } else {
-                        echo "<p> <span class='semresposta'>Ainda não há resposta para este relato.</span></p>";
+                        echo "<p> <span class='semresposta'>Ainda não há tratativas para este relato.</span></p>";
                     }
                 } else {
                     echo "<p>Nenhum relato encontrado com o ID fornecido.</p>";

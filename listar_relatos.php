@@ -5,7 +5,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
     <title>Listagem de Relatos</title>
-    <style>
+</head>
+
+<style>
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: #1d1d1d;
@@ -103,10 +105,10 @@
         }
 
         .dot {
-            height: 12px;
-            width: 12px;
+            height: 14px;
+            width: 14px;
             border-radius: 50%;
-            margin-right: 6px;
+            margin-right: -5px;
         }
 
         .dot-green {
@@ -171,14 +173,35 @@
             color:green;
             font-weight: bold; 
         }
+
+        .px{
+            color: #00acc1;
+            font-weight: bold;
+        }
+
+        .green{
+            color: green;
+        }
+
+        .red{
+            color: red;
+        }
+
     </style>
-</head>
+
+<script>
+    // Função para confirmar a exclusão de um relato com base no ID
+    function confirmarExclusao(relatoId) {
+        return confirm("Tem certeza que deseja excluir o relato com ID " + relatoId + "? Essa ação não poderá ser desfeita.");
+    }
+</script>
 <body>
     <div class="content-box">
         <div class="button-container">
-            <button onclick="window.location.href = 'index.php';">Voltar para Página Inicial</button>
+            <button onclick="window.location.href = 'index.php';">Página Inicial</button>
         </div>
         <h1>Lista de Relatos</h1>
+        <p>Está página contém todos os relatos já efetuados por usuários, aqui você pode efetuar tratativas únicas quanto a cada relato ou editar uma tratativa já efetuada. Também é possível excluir um relato caso ele já tenha sido totalmente efetuado clicando no botão <span class="px">X</span>. As bolinhas antes do identificador de ID representam se o Relato já recebeu uma tratativa, se a bolinha for <span class="green">verde</span> já houve resposta para o relato, se não a cor da bolinha será <span class="red">vermelha</span> e ainda há necessidade de responder o respectivo Relato.</p>
         <?php
         // Inclua o arquivo de conexão
         require 'db_connection.php';
@@ -213,9 +236,9 @@
                 $relatoId = $_POST["relato_id"];
                 $resposta = $_POST["resposta"];
 
-                // Check if the response is empty (indicating an edit) or not (indicating a new response)
+                // Verifica se a resposta não está vazia (indicando uma edição) ou não (indicando uma nova resposta)
                 if (!empty($resposta)) {
-                    // Update the response
+                    // Atualiza a resposta
                     atualizarResposta($pdo, $relatoId, $resposta);
                 }
             }
@@ -242,8 +265,11 @@
                     $relatoTexto = $relato['relato'];
                     $resposta = $relato['resposta'];
 
-                    // Add dot based on response status
+                    // Adiciona um ponto com base no status da resposta
                     $dotClass = empty($resposta) ? 'dot-red' : 'dot-green';
+                    
+                    // Converte o timestamp para um formato de data e hora legíveis
+                    $dataCriacao = date("d/m/Y H:i", strtotime($relato['data_criacao']));
 
                     echo "<hr>";
                     echo "<div style='position: relative;'>";
@@ -253,15 +279,16 @@
                     echo "</div>";
                     echo "<p><span class='variable'>Nome do usuário:</span> $nomeUsuario</p>";
                     echo "<p><span class='variable'>Email do usuário:</span> $emailUsuario</p>";
+                    echo "<p><span class='variable'>Data e Hora do relato:</span> $dataCriacao</p>";
                     echo "<p><span class='relato'>Relato:</span></p>";
                     echo "<p>$relatoTexto</p>";
 
-                    // Add the "X" button for relato deletion
-                    echo "<form action=\"\" method=\"POST\">";
+                    // Botão para excluir o relato com alerta de confirmação
+                    echo "<form action=\"\" method=\"POST\" onsubmit=\"return confirmarExclusao('$relatoId');\">";
                     echo "<input type=\"hidden\" name=\"relato_id\" value=\"$relatoId\">";
                     echo "<button type=\"submit\" class=\"delete-button\" name=\"excluir\" title=\"Excluir relato\">X</button>";
-                    echo "</form>"; 
-
+                    echo "</form>";
+                    
                     // Exibe o campo de resposta apenas se o relato ainda não tiver sido respondido
                     if (empty($resposta)) {
                         echo "<form action=\"\" method=\"POST\">";

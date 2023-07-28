@@ -69,8 +69,11 @@
         if (isset($_GET['id'])) {
             $id = $_GET['id'];
             echo "<h1>Relato Enviado com Sucesso</h1>";
-            echo "<p>Guarde seu ID para consultar tratativas futuras</p>";
-            echo "<p>ID do Relato: $id</p>";
+            echo "<p>Obrigado por nos informar, nossa equipe fará uma análise e retornará em breve com uma tratativa quanto ao seu Relato!</p>";
+            echo "<hr>"; 
+            echo "<br>";
+            echo "<p>Não se esqueça de guardar o seu ID para consultar futuras tratativas</p>";
+            echo "<p>ID do Relato: <b>$id</b></p>";
             echo "<button class='button' onclick='copyToClipboard(\"$id\")'>Copiar ID</button>";
         } else {
             echo "<h1>ID do relato não disponível</h1>";
