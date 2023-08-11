@@ -104,6 +104,11 @@
             background-color: #fff;
             border-radius: 10px;
         }
+
+        footer p{
+            text-align: center;
+        }
+
     </style>
 </head>
 <body>
@@ -149,7 +154,7 @@
                         echo "<p> <span class='semresposta'>Ainda não há tratativas para este relato.</span></p>";
                     }
                 } else {
-                    echo "<p>Nenhum relato encontrado com o ID fornecido.</p>";
+                    echo "<p>Nenhum relato encontrado com o ID fornecido ou exluido pela equipe de tratativas.</p>";
                 }
             } catch (PDOException $e) {
                 // Em caso de erro, exibe uma mensagem de erro
@@ -160,6 +165,11 @@
         }
         ?>
         <button onclick="window.location.href = 'index.php';">Voltar para a Página Inicial</button>
+        <footer>
+            <br>
+            <hr>
+            <p><b>RelatosNVT©️</b> - Todos os direitos reservados.</p>
+    </footer>
     </div>
 </body>
 </html>
