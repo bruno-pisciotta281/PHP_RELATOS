@@ -4,7 +4,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
-    <title>NVT - RELATOS</title>
+    <title>NVT - RELATOS</title>  
     <style>
         /* Estilo do corpo da página */
         body {
@@ -25,6 +25,7 @@
             border-radius: 10px;
             padding: 20px;
             max-width: 600px;
+            max-height: 100vh;
             width: 80%;
             position: relative;
             overflow-y: auto;
@@ -44,9 +45,10 @@
 
         /* Estilo do parágrafo de texto */
         p {
-            margin: 10px;
+            margin: 5px;
             color:  #1d1d1d;
             text-align: justify;
+            font-size: 14px;
         }
 
         /* Estilo do campo de entrada de texto */
@@ -61,7 +63,8 @@
 
         /* Estilo do botão */
         button {
-            padding: 10px 20px;
+            height: 28px;
+            padding: 3px 13px;
             margin: 10px;
             border: none;
             border-radius: 5px;
@@ -86,10 +89,12 @@
         }
 
         /* Estilo do botão na content-box */
-        button.button-content {
+        button.button-relatos {
             position: absolute;
             top: 9px;
             right: 10px;
+            color: white;
+            background-color: #00acc1;
         }
 
         /* Estilo do botão de logout */
@@ -102,15 +107,15 @@
 
         /* Efeito de hover do botão de logout */
         button.logout-button:hover{
-            background-color: #1d1d1d;
-            color: #00acc1;
+            background-color: red;
+            color: white;
             transition: background-color 0.3s, color 0.3s;
         }
 
         /* Estilo do parágrafo secundário */
         .p2 {
             text-align: center;
-            font-size: 16px;
+            font-size: 13px;
         }
 
         /* Estilo da barra de rolagem */
@@ -130,6 +135,12 @@
         ::-webkit-scrollbar-track {
             background-color: #fff;
             border-radius: 10px;
+        }
+
+        footer p{
+            font-size: 12px;
+            margin: 0px !important;
+            text-align: center;
         }
 
     </style>
@@ -154,10 +165,10 @@
         exit();
     }
 
-    // Verifica se o usuário está logado e se é o USUARIO_TRATATIVA
+     //Verifica se o usuário está logado e se é o USUARIO_TRATATIVA
     if (isset($_SESSION["nivel_acesso"]) && $_SESSION["nivel_acesso"] === "usuario_tratativa") {
         // Botão para redirecionar para a página de listar_relatos.php
-        echo '<button class="button-content" onclick="window.location.href = \'listar_relatos.php\';"> RELATOS</button>';
+        echo '<button class="button-relatos" onclick="window.location.href = \'listar_relatos.php\';"> RELATOS</button>';
     }
 
     // Botão de logout
@@ -190,7 +201,11 @@
                 <button type="submit">Consultar Relato</button>
             </div>
         </form>
-        
+        <footer>
+            <hr>
+            <br>
+            <p><b>RelatosNVT©️</b> - Todos os direitos reservados.</p>
+        </footer>
     </div>
 
         <script>
@@ -209,14 +224,6 @@
                     this.value = 'Insira aqui o ID do Relato';
                 }
                 });
-
-                // Função para limpar o texto inicial do campo
-                function limparTextoInicial() {
-                const meuInput = document.getElementById('relato_id');
-                if (meuInput.value === 'Insira aqui o ID do Relato') {
-                    meuInput.value = '';
-                }
-                }
         </script>
 
 </body>
