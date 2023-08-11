@@ -82,6 +82,11 @@
             color:  #1d1d1d;
             text-align: center;
         }
+
+        footer p{
+            text-align: center;
+        }
+
     </style>
 </head>
 <body>
@@ -91,7 +96,6 @@
         <p>Olá, este é o sistema de Relatos da Novo TempoRH. Para acessar a plataforma e iniciar um <b>Relato</b> efetue login com as credênciais abaixo: <br><br>E-mail: <b>relato@nvt.com</b> <br> Senha: <b>relato123</b> <br><br></p>
         
         <?php
-            // login.php
 
             include_once 'config.php';
 
@@ -112,7 +116,7 @@
                 echo '<div style="padding: 5px 15px; margin: 1px; border: none; border-radius: 5px; background-color: #00acc1; color: #fff; font-weight: bold; cursor: pointer;" onclick="window.location.href = \'listagem_relatos.php\';">Lista de Relatos</div>';
             }
 
-                // Verifica se a URL contém o parâmetro "error" com valor igual a 1
+            // Verifica se a URL contém o parâmetro "error" com valor igual a 1
             if (isset($_GET["error"]) && $_GET["error"] == 1) {
                 echo '<p class="error-message">E-mail ou senha incorretos. Por favor, tente novamente.</p>';
             }
