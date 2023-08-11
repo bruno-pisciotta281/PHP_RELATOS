@@ -72,9 +72,10 @@
     .content-box {
         background-color: #fff;
         border-radius: 10px;
-        padding: 50px;
+        padding: 30px;
         max-width: 600px;
-        width: 80%;
+        width: 100%;
+        overflow-y: auto;
     }
 
     h1 {
@@ -92,7 +93,7 @@
     input[type="email"],
     textarea {
         width: 100%;
-        padding: 10px;
+        padding: 6px;
         margin-bottom: 10px;
         border: 1px solid #00acc1;
         border-radius: 5px;
@@ -158,6 +159,29 @@
         opacity: 1; /* Torna o checkmark visível quando a checkbox está marcada */
         }
 
+        footer p{
+            text-align: center;
+        }
+
+        /* Style the scrollbar */
+        ::-webkit-scrollbar {
+        width: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #00acc1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #1d1d1d;
+        }
+
+        ::-webkit-scrollbar-track {
+            background-color: #fff;
+            border-radius: 10px;
+        }
+        
 </style>
 
     <div class="content-box">
@@ -189,6 +213,11 @@
                 <button onclick="window.location.href = 'index.php';">Voltar</button>
             </div>
         </form>
+        <footer>
+            <br>
+            <hr>
+            <p><b>RelatosNVT©️</b> - Todos os direitos reservados.</p>
+        </footer>
     </div>
 
     <script>
@@ -211,7 +240,7 @@
                 });
                 relatoLabel.style.display = "block";
 
-                // Preenche os campos "nome" e "email" com "anônimo"
+                // Preenche os campos "nome" e "email" como relato anônimo
                 nomeInput.value = "anônimo";
                 emailInput.value = "anonimo@anonimo";
             } else {
@@ -230,7 +259,7 @@
             }
         }
 
-        // Gerar um ID único e atribuir ao campo oculto antes de enviar o formulário
+        // Gerar um ID único e atribui ao campo oculto antes de enviar o formulário
         document.querySelector("form").addEventListener("submit", function (event) {
             const relatoIdField = document.getElementById("relato_id");
             const relatoId = generateUniqueId(); // Função que gera o ID único (você pode implementá-la)
