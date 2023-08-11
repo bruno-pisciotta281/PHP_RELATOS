@@ -27,6 +27,7 @@
             padding: 50px;
             max-width: 600px;
             width: 80%;
+            max-height: 90vh;
         }
 
         h1 {
@@ -59,6 +60,11 @@
             color: #00acc1;
             transition: background-color 0.3s, color 0.3s;
         }
+
+        footer p{
+            text-align: center;
+        }
+
     </style>
 
     <div class="content-box">
@@ -68,7 +74,7 @@
         // Verifica se o ID do relato foi enviado através da URL
         if (isset($_GET['id'])) {
             $id = $_GET['id'];
-            echo "<h1>Relato Enviado com Sucesso</h1>";
+            echo "<h1>Relato Enviado com Sucesso!</h1>";
             echo "<p>Obrigado por nos informar, nossa equipe fará uma análise e retornará em breve com uma tratativa quanto ao seu Relato!</p>";
             echo "<hr>"; 
             echo "<br>";
@@ -83,6 +89,11 @@
         <div class="button-container">
             <button class="button" onclick="window.location.href = 'index.php';">Voltar para a Página Inicial</button>
         </div>
+        <footer>
+            <br>
+            <hr>
+            <p><b>RelatosNVT©️</b> - Todos os direitos reservados.</p>
+    </footer>
     </div>
 
     <script>
