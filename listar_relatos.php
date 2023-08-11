@@ -43,7 +43,7 @@
 
         button {
             padding: 10px 20px;
-            margin: 10px;
+            margin: 0px;
             border: none;
             border-radius: 5px;
             background-color: #00acc1;
@@ -187,6 +187,62 @@
             color: red;
         }
 
+        footer p{
+            text-align: center;
+        }
+
+        .filter{
+            color: #00acc1;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        textarea{
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Style the filter container */
+        /* Style the select input */
+        .filter-container select,
+        .filter-container input[type="date"] {
+            
+            font-family: 'Montserrat', sans-serif;
+            border: 1px solid #00acc1;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #1d1d1d;
+            width: 200px;
+            height: 25px;
+        }
+
+        /* Style the submit button for filters */
+        .filter-container button[type="submit"] {
+            background-color: #00acc1;
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Hover effect for the submit button */
+        .filter-container button[type="submit"]:hover {
+            background-color: #1d1d1d;
+        }
+
+        /* Adjust margins for the filter elements */
+        .filter-container select {
+            margin-right: 10px;
+        }
+
+        /* Clear the default input styles for date input */
+        .filter-container input[type="date"]::-webkit-inner-spin-button,
+        .filter-container input[type="date"]::-webkit-clear-button,
+        .filter-container input[type="date"]::-webkit-calendar-picker-indicator {
+            color: #00acc1;
+            -webkit-appearance: none;
+        }
+
     </style>
 
 <script>
@@ -201,11 +257,71 @@
             <button onclick="window.location.href = 'index.php';">Página Inicial</button>
         </div>
         <h1>Lista de Relatos</h1>
-        <p>Está página contém todos os relatos já efetuados por usuários, aqui você pode efetuar tratativas únicas quanto a cada relato ou editar uma tratativa já efetuada. Também é possível excluir um relato caso ele já tenha sido totalmente efetuado clicando no botão <span class="px">X</span>. As bolinhas antes do identificador de ID representam se o Relato já recebeu uma tratativa, se a bolinha for <span class="green">verde</span> já houve resposta para o relato, se não a cor da bolinha será <span class="red">vermelha</span> e ainda há necessidade de responder o respectivo Relato.</p>
+        <p>Esta página contém todos os relatos já efetuados por usuários, aqui você pode enviar tratativas únicas quanto a cada relato ou editar uma tratativa já efetuada. Também é possível excluir um relato caso ele já tenha sido totalmente efetuado clicando no botão <span class="px">X</span>. As bolinhas antes do identificador de ID representam se o Relato já recebeu uma tratativa, se a bolinha for <span class="green">verde</span> já houve resposta para o relato, se não a cor da bolinha será <span class="red">vermelha</span> e ainda há necessidade de tratar o respectivo Relato.</p>
+
+        <hr>
+        <p class="filter">Filtros de Pesquisa</p>
+        <div class="filter-container">
+            <form action="listar_relatos.php" method="GET">
+                <select class="filter-select" name="status">
+                    <option value="">Todos</option>
+                    <option value="respondidos">Respondidos</option>
+                    <option value="nao_respondidos">Não Respondidos</option>
+                </select>
+                <input class="filter-input" type="date" name="data" placeholder="Filtrar por data">
+                <button type="submit">Filtrar</button>
+            </form>
+        </div>    
+
         <?php
         // Inclua o arquivo de conexão
         require 'db_connection.php';
 
+        $status = isset($_GET['status']) ? $_GET['status'] : '';
+        $data = isset($_GET['data']) ? $_GET['data'] : '';
+
+        $consultaQuery = "SELECT * FROM tabela_de_relatos";
+
+        $status = isset($_GET['status']) ? $_GET['status'] : '';
+        $data = isset($_GET['data']) ? $_GET['data'] : '';
+        $username = isset($_GET['username']) ? $_GET['username'] : ''; // Captura o nome de usuário
+
+        $consultaQuery = "SELECT * FROM tabela_de_relatos";
+
+        $conditions = [];
+        $parameters = [];
+
+        if ($status == 'respondidos') {
+            $conditions[] = "resposta IS NOT NULL";
+        } elseif ($status == 'nao_respondidos') {
+            $conditions[] = "resposta IS NULL";
+        }
+
+        if (!empty($data)) {
+            $formattedDate = date("Y-m-d", strtotime($data)); // Formata a data no formato do banco de dados
+            $conditions[] = "DATE(data_criacao) = '$formattedDate'";
+        }
+
+        if (!empty($conditions)) {
+            $consultaQuery .= " WHERE " . implode(" AND ", $conditions);
+        }
+
+        $consultaQuery .= " ORDER BY data_criacao DESC";
+        $consultaStmt = $pdo->prepare($consultaQuery);
+        $consultaStmt->execute();
+
+        
+        foreach ($parameters as $key => $value) {
+            if ($key == ':keyword_value') {
+                $consultaStmt->bindValue($key, $value, PDO::PARAM_STR);
+            } else {
+                $consultaStmt->bindValue($key, $value);
+            }
+        }
+        
+        $consultaStmt->execute();
+
+        
         // Função para atualizar a resposta do relato
         function atualizarResposta($pdo, $relatoId, $resposta)
         {
@@ -252,7 +368,6 @@
             }
 
             // Prepara a consulta SQL para obter todos os relatos cadastrados, ordenados pela data de criação
-            $consultaQuery = "SELECT * FROM tabela_de_relatos ORDER BY data_criacao DESC";
             $consultaStmt = $pdo->query($consultaQuery);
 
             // Verifica se existem relatos cadastrados
@@ -317,6 +432,10 @@
             echo 'Erro ao consultar o banco de dados: ' . $e->getMessage();
         }
         ?>
+        <footer>
+            <br>
+            <p><b>RelatosNVT©️</b> - Todos os direitos reservados.</p>
+        </footer>
     </div>
 </body>
 </html>
