@@ -149,29 +149,9 @@
     <div class="content-box">
     <?php
     // index.php
-
     // Incluir o arquivo de configuração
     include_once 'config.php';
-
-    // Iniciar a sessão (caso ainda não esteja iniciada)
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-
-    // Verifica se o usuário está logado
-    if (!isset($_SESSION["nivel_acesso"])) {
-        // Se o usuário não estiver logado, redireciona para a página de login
-        header("Location: login.php");
-        exit();
-    }
-
-     //Verifica se o usuário está logado e se é o USUARIO_TRATATIVA
-    if (isset($_SESSION["nivel_acesso"]) && $_SESSION["nivel_acesso"] === "usuario_tratativa") {
-        // Botão para redirecionar para a página de listar_relatos.php
-        echo '<button class="button-relatos" onclick="window.location.href = \'listar_relatos.php\';"> RELATOS</button>';
-    }
-
-    // Botão de logout
+    echo '<button class="button-relatos" onclick="window.location.href = \'login_process.php\';"> RELATOS</button>';
     echo '<button class="logout-button" onclick="window.location.href = \'logout.php\';">SAIR</button>';
     ?>
         <!-- Título principal -->

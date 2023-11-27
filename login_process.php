@@ -48,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION["user_id"] = $credenciais[1];
 
         // Redireciona para a página index.php
-        header("Location: index.php");
+        header("Location: listar_relatos.php");
         exit();
     } else {
         // Caso as credenciais estejam incorretas, redireciona de volta para a página de login com uma mensagem de erro

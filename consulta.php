@@ -1,5 +1,23 @@
+<?php
+// Inclua o arquivo de configuração
+include_once 'config.php';
+
+// Inicie a sessão (caso ainda não esteja iniciada)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Verifica se o usuário está logado e se é o USUARIO_TRATATIVA
+if (!isset($_SESSION["nivel_acesso"]) || $_SESSION["nivel_acesso"] !== "usuario_tratativa") {
+    // Se não for um usuário de tratativa, redirecione para a página de login
+    header("Location: login.php");
+    exit();
+}
+?>
+
+
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -86,6 +104,26 @@
             font-weight: bold; 
         }
 
+        .dot {
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            margin-right: -5px;
+            display: inline-block;
+        }
+
+        .dot-green {
+            background-color: green;
+        }
+
+        .dot-red {
+            background-color: red;
+        }
+
+        .dot-yellow {
+            background-color: orange;
+        }
+
         /* Style the scrollbar */
         ::-webkit-scrollbar {
         width: 10px;
@@ -137,8 +175,13 @@
                     // Convertendo o timestamp para formato de data e hora legíveis
                     $dataCriacao = date("d/m/Y H:i", strtotime($relato['data_criacao']));
 
+                    $statusRelato = isset($_POST["novo_status_$relatoId"]) ? $_POST["novo_status_$relatoId"] : $relato['status'];
+
                     echo "<hr>";
-                    echo "<p><span class='variable'>ID do relato:</span> $relatoId</p>";
+                    $dotClass = getStatusDotClass($statusRelato);
+                    echo "<p></span><span class='variable'>ID do relato:</span> $relatoId</p>";
+                    $statusRelato = isset($_POST["novo_status_$relatoId"]) ? $_POST["novo_status_$relatoId"] : $relato['status'];
+                    echo "<p></span><span class='variable'>Status do relato: </span>$statusRelato <span class='$dotClass dot'></p>";
                     echo "<p><span class='variable'>Nome do usuário:</span> $nomeUsuario</p>";
                     echo "<p><span class='variable'>Email do usuário:</span> $emailUsuario</p>";
                     echo "<p><span class='variable'>Data e Hora do relato:</span> $dataCriacao</p>";
@@ -163,13 +206,28 @@
         } else {
             echo "<p>Nenhum ID de relato fornecido para consulta.</p>";
         }
+
+        // Função para obter a classe da bolinha com base no status
+        function getStatusDotClass($status) {
+            $status = strtolower($status);  // Converta para minúsculas
+            switch ($status) {
+                case 'em aberto':
+                    return 'dot-green';
+                case 'em tratativa':
+                    return 'dot-yellow';
+                case 'fechado':
+                    return 'dot-red';
+                default:
+                    return 'dot-yellow'; // Se o status não coincidir com nenhum dos anteriores
+            }
+        }
         ?>
         <button onclick="window.location.href = 'index.php';">Voltar para a Página Inicial</button>
         <footer>
             <br>
             <hr>
             <p><b>RelatosNVT©️</b> - Todos os direitos reservados.</p>
-    </footer>
+        </footer>
     </div>
 </body>
 </html>

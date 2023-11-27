@@ -1,3 +1,19 @@
+<?php
+// Inclua o arquivo de configuração
+include_once 'config.php';
+
+// Inicie a sessão (caso ainda não esteja iniciada)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Verifica se o usuário está logado e se é o USUARIO_TRATATIVA
+if (!isset($_SESSION["nivel_acesso"]) || $_SESSION["nivel_acesso"] !== "usuario_tratativa") {
+    echo "Redirecionando para login.php";
+    header("Location: login.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -179,14 +195,6 @@
             font-weight: bold;
         }
 
-        .green{
-            color: green;
-        }
-
-        .red{
-            color: red;
-        }
-
         footer p{
             text-align: center;
         }
@@ -242,6 +250,33 @@
             color: #00acc1;
             -webkit-appearance: none;
         }
+
+        .select{
+            align-items: left;
+        }
+
+        .select select{
+            margin-right: 1%;
+            border-style: solid;
+            border-color: #00acc1 !important;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .dot-green {
+            background-color: green;
+        }
+
+        .dot-red {
+            background-color: red;
+        }
+
+        .dot-yellow {
+            background-color: orange;
+        }
+
+       
 
     </style>
 
@@ -334,6 +369,17 @@
             }
         }
 
+        function atualizarStatus($pdo, $relatoId, $novoStatus)
+        {
+            try {
+                $stmt = $pdo->prepare("UPDATE tabela_de_relatos SET status = ? WHERE relato_id = ?");
+                $stmt->execute([$novoStatus, $relatoId]);
+            } catch (PDOException $e) {
+                // Em caso de erro, exibe uma mensagem de erro
+                echo 'Erro ao atualizar o status do relato: ' . $e->getMessage();
+            }
+        }
+
         // Função para excluir o relato
         function excluirRelato($pdo, $relatoId)
         {
@@ -370,6 +416,25 @@
             // Prepara a consulta SQL para obter todos os relatos cadastrados, ordenados pela data de criação
             $consultaStmt = $pdo->query($consultaQuery);
 
+            function getStatusDotClass($status) {
+                $status = strtolower($status);  // Converta para minúsculas
+                switch ($status) {
+                    case 'em aberto':
+                        return 'dot-red';
+                    case 'em tratativa':
+                        return 'dot-yellow';
+                    case 'fechado':
+                    case 'fechado':
+                        return 'dot-red';
+                    case 'em_aberto':
+                        return 'dot-green';
+                    case 'fechado':  
+                        return 'dot-red';
+                    default:
+                        return 'dot-yellow'; // Se o status não coincidir com nenhum dos anteriores
+                }
+            }
+
             // Verifica se existem relatos cadastrados
             if ($consultaStmt->rowCount() > 0) {
                 // Exibe a lista de relatos
@@ -380,11 +445,19 @@
                     $relatoTexto = $relato['relato'];
                     $resposta = $relato['resposta'];
 
-                    // Adiciona um ponto com base no status da resposta
-                    $dotClass = empty($resposta) ? 'dot-red' : 'dot-green';
-                    
                     // Converte o timestamp para um formato de data e hora legíveis
                     $dataCriacao = date("d/m/Y H:i", strtotime($relato['data_criacao']));
+
+                     // Exibe o estado do relato
+                    if (isset($_POST["novo_status_$relatoId"])) {
+                        $statusRelato = $_POST["novo_status_$relatoId"];
+                    } else {
+                        $statusRelato = $relato['status'];
+                    }
+
+                    var_dump($statusRelato);  // Adicione esta linha para depurar
+                    $dotClass = getStatusDotClass($statusRelato);
+                    var_dump($dotClass);  // Adicione esta linha também
 
                     echo "<hr>";
                     echo "<div style='position: relative;'>";
@@ -392,18 +465,38 @@
                     echo "<span class='$dotClass dot'></span>";
                     echo "<p><span class='variable'>ID do relato:</span> $relatoId</p>";
                     echo "</div>";
+                    echo "<p><span class='variable'>Status do relato:</span> $statusRelato</p>";
                     echo "<p><span class='variable'>Nome do usuário:</span> $nomeUsuario</p>";
                     echo "<p><span class='variable'>Email do usuário:</span> $emailUsuario</p>";
                     echo "<p><span class='variable'>Data e Hora do relato:</span> $dataCriacao</p>";
+
+                    // Processamento do formulário
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["relato_id"]) && isset($_POST["novo_status_$relatoId"])) {
+                        $relatoId = $_POST["relato_id"];
+                        $novoStatus = $_POST["novo_status_$relatoId"];
+
+                        // Atualiza o estado do relato no banco de dados
+                        atualizarStatus($pdo, $relatoId, $novoStatus);
+                        
+                        // Atualiza a variável local para refletir a mudança
+                        $statusRelato = $novoStatus;
+                    }
+
+                    // Verifica se o formulário foi submetido para atualizar o status
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["novo_status"])) {
+                        $novoStatus = $_POST["novo_status"];
+                        // Atualiza o estado do relato
+                        atualizarStatus($pdo, $relatoId, $novoStatus);
+                    }
+
+                    echo "<div class = 'relatos'>";
                     echo "<p><span class='relato'>Relato:</span></p>";
                     echo "<p>$relatoTexto</p>";
-
                     // Botão para excluir o relato com alerta de confirmação
                     echo "<form action=\"\" method=\"POST\" onsubmit=\"return confirmarExclusao('$relatoId');\">";
                     echo "<input type=\"hidden\" name=\"relato_id\" value=\"$relatoId\">";
                     echo "<button type=\"submit\" class=\"delete-button\" name=\"excluir\" title=\"Excluir relato\">X</button>";
                     echo "</form>";
-                    
                     // Exibe o campo de resposta apenas se o relato ainda não tiver sido respondido
                     if (empty($resposta)) {
                         echo "<form action=\"\" method=\"POST\">";
@@ -414,6 +507,7 @@
                     } else {
                         echo "<p><span class='respostaRelato'>Resposta do relato:</span></p>";
                         echo "<p>$resposta</p>";
+                        echo "</div>";
                         echo "<form action=\"\" method=\"POST\">";
                         echo "<input type=\"hidden\" name=\"relato_id\" value=\"$relatoId\">";
                         echo "<textarea name=\"resposta\" placeholder=\"Insira a resposta ou faça a edição aqui\" required></textarea>";
@@ -421,6 +515,19 @@
                         echo "</form>";
                     }
 
+                    echo "<br>";
+                        // Adiciona um menu suspenso para selecionar o estado
+                        echo "<div class ='select'>";
+                        echo "<form action=\"\" method=\"POST\">";
+                        echo "<input type=\"hidden\" name=\"relato_id\" value=\"$relatoId\">";
+                        echo "<select name=\"novo_status_$relatoId\">";
+                        echo "<option value=\"em_aberto\" " . ($statusRelato == 'Em Aberto' ? 'selected' : '') . ">Em Aberto</option>";
+                        echo "<option value=\"em_tratativa\" " . ($statusRelato == 'Em Tratativa' ? 'selected' : '') . ">Em Tratativa</option>";
+                        echo "<option value=\"fechado\" " . ($statusRelato == 'Fechado' ? 'selected' : '') . ">Fechado</option>";
+                        echo "</select>";
+                        echo "<button type=\"submit\">Atualizar Status</button>";
+                        echo "</form>";
+                        echo "</div>";                       
                     echo "</div>";
                     echo "<hr>";
                 }

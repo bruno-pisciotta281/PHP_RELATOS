@@ -87,35 +87,33 @@
             text-align: center;
         }
 
+        /* Estilo do botão de logout */
+        button.voltar-button {
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            background-color: #00acc1;
+        }
+
+        /* Efeito de hover do botão de logout */
+        button.voltar-button:hover{
+            background-color: #00acc1;
+            color: white;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
     </style>
 </head>
 <body>
     <div class="content-box">
         <h1>Bem Vindo!</h1>
         <hr>
-        <p>Olá, este é o sistema de Relatos da Novo TempoRH. Para acessar a plataforma e iniciar um <b>Relato</b> efetue login com as credênciais abaixo: <br><br>E-mail: <b>relato@nvt.com</b> <br> Senha: <b>relato123</b> <br><br></p>
+        <p>Olá, para você que é responsável pela tratativas dos relatos efetue seu login!</p>
         
         <?php
 
             include_once 'config.php';
-
-            // Iniciar a sessão (caso ainda não esteja iniciada)
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-            }
-
-            // Verifica se o usuário está logado
-            if (isset($_SESSION["nivel_acesso"])) {
-                // Se o usuário já estiver logado, redireciona para a página de index
-                header("Location: index.php");
-                exit();
-            }
-
-            // Verifica se o usuário está logado e se é o USUARIO_TRATATIVA
-            if (isset($_SESSION["nivel_acesso"]) && $_SESSION["nivel_acesso"] === "usuario_tratativa") {
-                echo '<div style="padding: 5px 15px; margin: 1px; border: none; border-radius: 5px; background-color: #00acc1; color: #fff; font-weight: bold; cursor: pointer;" onclick="window.location.href = \'listagem_relatos.php\';">Lista de Relatos</div>';
-            }
-
+            echo '<button class="voltar-button" onclick="window.location.href = \'index.php\';">Voltar</button>';
             // Verifica se a URL contém o parâmetro "error" com valor igual a 1
             if (isset($_GET["error"]) && $_GET["error"] == 1) {
                 echo '<p class="error-message">E-mail ou senha incorretos. Por favor, tente novamente.</p>';
@@ -132,7 +130,7 @@
             <button type="submit">Entrar</button>
         </form>
         <hr>
-        <p class="final">Caso deseje efetuar tratativas, entre em contato com seu gestor e obtenha o acesso!</p>
+        <p class="final">Caso não possua um login tratativa entre em contato com seu supervisor!</p>
     </div>
 </body>
 </html>
