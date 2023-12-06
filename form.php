@@ -132,7 +132,6 @@
         appearance: none; /* Remove a aparência padrão da checkbox */
         -webkit-appearance: none;
         -moz-appearance: none;
-        display: inline-block;
         width: 20px;
         height: 20px;
         background-color: #fff;
@@ -140,6 +139,7 @@
         border-radius: 5px;
         cursor: pointer;
         position: relative;
+        float: left;
         }
 
         /* Estilo do checkmark (marcador da checkbox) */
@@ -189,8 +189,8 @@
         <p>Esta é a página de formulário para a criação de um relato. Insira seus dados e seu relato, caso prefira optar por não se identificar, selecione a opção "anônimo" e preencha somente o campo "Relato".</p>
         <hr>
         <br>
-        <label for="anonimo">Relato Anônimo:</label>
-        <input type="checkbox" class="checkbox-custom" id="chkAnonimo" onclick="toggleRelatoFields();"><br>
+        <label for="anonimo">Relato anônimo?</label>
+        <input type="checkbox" class="checkbox-custom" id="chkAnonimo" onclick="toggleRelatoFields();"><br><br>
 
         <form action="process_form.php" method="POST" id="form">
             <div id="nomeEmailFields">

@@ -1,19 +1,4 @@
-<?php
-// Inclua o arquivo de configuração
-include_once 'config.php';
 
-// Inicie a sessão (caso ainda não esteja iniciada)
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Verifica se o usuário está logado e se é o USUARIO_TRATATIVA
-if (!isset($_SESSION["nivel_acesso"]) || $_SESSION["nivel_acesso"] !== "usuario_tratativa") {
-    echo "Redirecionando para login.php";
-    header("Location: login.php");
-    exit();
-}
-?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -345,7 +330,6 @@ if (!isset($_SESSION["nivel_acesso"]) || $_SESSION["nivel_acesso"] !== "usuario_
         $consultaStmt = $pdo->prepare($consultaQuery);
         $consultaStmt->execute();
 
-        
         foreach ($parameters as $key => $value) {
             if ($key == ':keyword_value') {
                 $consultaStmt->bindValue($key, $value, PDO::PARAM_STR);
@@ -369,6 +353,17 @@ if (!isset($_SESSION["nivel_acesso"]) || $_SESSION["nivel_acesso"] !== "usuario_
             }
         }
 
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["relato_id"]) && isset($_POST["resposta"])) {
+            $relatoId = $_POST["relato_id"];
+            $resposta = $_POST["resposta"];
+        
+            if (!empty($resposta)) {
+                // Adiciona nova tratativa
+                $inserirTratativa = $pdo->prepare("INSERT INTO tratativas (relato_id, resposta) VALUES (?, ?)");
+                $inserirTratativa->execute([$relatoId, $resposta]);
+            }
+        }
+
         function atualizarStatus($pdo, $relatoId, $novoStatus)
         {
             try {
@@ -380,6 +375,28 @@ if (!isset($_SESSION["nivel_acesso"]) || $_SESSION["nivel_acesso"] !== "usuario_
             }
         }
 
+        // Processamento do formulário
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["relato_id"]) && isset($_POST["excluir"])) {
+            $relatoId = $_POST["relato_id"];
+
+            // Exclui manualmente as tratativas associadas ao relato
+            excluirTratativas($pdo, $relatoId);
+
+            // Exclui o relato da tabela
+            excluirRelato($pdo, $relatoId);
+        }
+
+        // Função para excluir manualmente as tratativas
+        function excluirTratativas($pdo, $relatoId)
+        {
+            try {
+                $stmt = $pdo->prepare("DELETE FROM tratativas WHERE relato_id = ?");
+                $stmt->execute([$relatoId]);
+            } catch (PDOException $e) {
+                echo 'Erro ao excluir tratativas: ' . $e->getMessage();
+            }
+        }
+
         // Função para excluir o relato
         function excluirRelato($pdo, $relatoId)
         {
@@ -387,7 +404,6 @@ if (!isset($_SESSION["nivel_acesso"]) || $_SESSION["nivel_acesso"] !== "usuario_
                 $stmt = $pdo->prepare("DELETE FROM tabela_de_relatos WHERE relato_id = ?");
                 $stmt->execute([$relatoId]);
             } catch (PDOException $e) {
-                // Em caso de erro, exibe uma mensagem de erro
                 echo 'Erro ao excluir o relato: ' . $e->getMessage();
             }
         }
@@ -413,6 +429,7 @@ if (!isset($_SESSION["nivel_acesso"]) || $_SESSION["nivel_acesso"] !== "usuario_
                 excluirRelato($pdo, $relatoId);
             }
 
+            
             // Prepara a consulta SQL para obter todos os relatos cadastrados, ordenados pela data de criação
             $consultaStmt = $pdo->query($consultaQuery);
 
@@ -492,33 +509,76 @@ if (!isset($_SESSION["nivel_acesso"]) || $_SESSION["nivel_acesso"] !== "usuario_
                     echo "<div class = 'relatos'>";
                     echo "<p><span class='relato'>Relato:</span></p>";
                     echo "<p>$relatoTexto</p>";
-                    // Botão para excluir o relato com alerta de confirmação
+
+                    
+                    $tratativasQuery = "SELECT * FROM tratativas WHERE relato_id = :relato_id";
+                    $tratativasStmt = $pdo->prepare($tratativasQuery);
+                    $tratativasStmt->bindParam(':relato_id', $relatoId);
+                    $tratativasStmt->execute();
+                    
+                 // Botão para excluir o relato com alerta de confirmação
                     echo "<form action=\"\" method=\"POST\" onsubmit=\"return confirmarExclusao('$relatoId');\">";
                     echo "<input type=\"hidden\" name=\"relato_id\" value=\"$relatoId\">";
                     echo "<button type=\"submit\" class=\"delete-button\" name=\"excluir\" title=\"Excluir relato\">X</button>";
                     echo "</form>";
-                    // Exibe o campo de resposta apenas se o relato ainda não tiver sido respondido
-                    if (empty($resposta)) {
-                        echo "<form action=\"\" method=\"POST\">";
-                        echo "<input type=\"hidden\" name=\"relato_id\" value=\"$relatoId\">";
-                        echo "<textarea name=\"resposta\" placeholder=\"Insira a resposta ou faça a edição aqui\" required></textarea>";
-                        echo "<button type=\"submit\">Enviar Resposta</button>";
-                        echo "</form>";
-                    } else {
-                        echo "<p><span class='respostaRelato'>Resposta do relato:</span></p>";
-                        echo "<p>$resposta</p>";
-                        echo "</div>";
-                        echo "<form action=\"\" method=\"POST\">";
-                        echo "<input type=\"hidden\" name=\"relato_id\" value=\"$relatoId\">";
-                        echo "<textarea name=\"resposta\" placeholder=\"Insira a resposta ou faça a edição aqui\" required></textarea>";
-                        echo "<button type=\"submit\" name=\"editar\">Editar Resposta</button>";
-                        echo "</form>";
+
+                   // Exibe tratativas existentes
+                    if ($tratativasStmt->rowCount() > 0) {
+                        echo "<p><span class='respostaRelato'>Tratativas:</span></p>";
+                        while ($tratativa = $tratativasStmt->fetch(PDO::FETCH_ASSOC)) {
+                            echo "<p>{$tratativa['resposta']} - {$tratativa['data_tratativa']}</p>";
+                        }
+                    }
+
+                    // Exibe o campo de resposta sempre
+                    echo "<form id=\"tratativaForm\" action=\"\" method=\"POST\">";
+                    echo "<input type=\"hidden\" name=\"relato_id\" value=\"$relatoId\">";
+                    echo "<textarea name=\"resposta\" placeholder=\"Insira a resposta ou faça a edição aqui\" required></textarea>";
+                    echo "<button type=\"submit\">Enviar Tratativa</button>";
+                    echo "</form>";
+
+                   // Processamento do formulário de tratativa
+                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["relato_id"]) && isset($_POST["resposta"])) {
+                        $relatoId = $_POST["relato_id"];
+                        $resposta = $_POST["resposta"];
+
+                        if (!empty($resposta)) {
+                            // Verifique se a tratativa já existe antes de adicioná-la
+                            $verificarTratativa = $pdo->prepare("SELECT COUNT(*) FROM tratativas WHERE relato_id = ? AND resposta = ?");
+                            $verificarTratativa->execute([$relatoId, $resposta]);
+
+                            if ($verificarTratativa->fetchColumn() == 0) {
+                                // Adiciona nova tratativa apenas se não existir uma tratativa idêntica
+                                try {
+                                    $inserirTratativa = $pdo->prepare("INSERT INTO tratativas (relato_id, resposta) VALUES (?, ?)");
+                                    $inserirTratativa->execute([$relatoId, $resposta]);
+
+                                    // Limpa o formulário após o envio da tratativa
+                                    echo "<script>";
+                                    echo "document.getElementById('tratativaForm').reset();";
+                                    echo "</script>";
+
+                                    // Redireciona para a mesma página usando GET após o envio do formulário POST
+                                    echo "<script>";
+                                    echo "window.location.href = 'listar_relatos.php';";
+                                    echo "</script>";
+                                    
+                                    // Interrompe a execução do script para evitar qualquer saída adicional
+                                    exit();
+                                } catch (PDOException $e) {
+                                    echo 'Erro ao adicionar tratativa: ' . $e->getMessage();
+                                }
+                            } else {
+                                // Tratativa idêntica já existe, pode tratar essa situação conforme necessário
+                                echo "Tratativa idêntica já existe.";
+                            }
+                        }
                     }
 
                     echo "<br>";
                         // Adiciona um menu suspenso para selecionar o estado
                         echo "<div class ='select'>";
-                        echo "<form action=\"\" method=\"POST\">";
+                        echo "<form id=\"tratativaForm\" action=\"\" method=\"POST\">";
                         echo "<input type=\"hidden\" name=\"relato_id\" value=\"$relatoId\">";
                         echo "<select name=\"novo_status_$relatoId\">";
                         echo "<option value=\"em_aberto\" " . ($statusRelato == 'Em Aberto' ? 'selected' : '') . ">Em Aberto</option>";
@@ -530,6 +590,7 @@ if (!isset($_SESSION["nivel_acesso"]) || $_SESSION["nivel_acesso"] !== "usuario_
                         echo "</div>";                       
                     echo "</div>";
                     echo "<hr>";
+
                 }
             } else {
                 echo "<p>Nenhum relato cadastrado.</p>";

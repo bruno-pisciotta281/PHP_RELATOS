@@ -147,6 +147,10 @@ if (!isset($_SESSION["nivel_acesso"]) || $_SESSION["nivel_acesso"] !== "usuario_
             text-align: center;
         }
 
+        .red{
+            color: red;
+        }
+
     </style>
 </head>
 <body>
@@ -189,15 +193,22 @@ if (!isset($_SESSION["nivel_acesso"]) || $_SESSION["nivel_acesso"] !== "usuario_
                     echo "<p><span class='relato'>Relato:</span></p>";
                     echo "<p>$relatoTexto</p>";
 
-                    // Exibe a resposta do relato, se existir
-                    if (!empty($resposta)) {
-                        echo "<p><span class='respostaRelato'>Resposta do relato:</span></p>";
-                        echo "<p>$resposta</p>";
+                    // Exibir tratativas
+                    $tratativasQuery = "SELECT * FROM tratativas WHERE relato_id = :relato_id";
+                    $tratativasStmt = $pdo->prepare($tratativasQuery);
+                    $tratativasStmt->bindParam(':relato_id', $relatoId);
+                    $tratativasStmt->execute();
+
+                    if ($tratativasStmt->rowCount() > 0) {
+                        echo "<p><span class='respostaRelato'>Tratativas:</span></p>";
+                        while ($tratativa = $tratativasStmt->fetch(PDO::FETCH_ASSOC)) {
+                            echo "<p>{$tratativa['resposta']} - {$tratativa['data_tratativa']}</p>";
+                        }
                     } else {
-                        echo "<p> <span class='semresposta'>Ainda não há tratativas para este relato.</span></p>";
+                        echo "<p class='red'>Nenhuma tratativa encontrada para este relato.</p>";
                     }
                 } else {
-                    echo "<p>Nenhum relato encontrado com o ID fornecido ou exluido pela equipe de tratativas.</p>";
+                    echo "<p>Nenhum relato encontrado com o ID fornecido ou excluído pela equipe de tratativas.</p>";
                 }
             } catch (PDOException $e) {
                 // Em caso de erro, exibe uma mensagem de erro
