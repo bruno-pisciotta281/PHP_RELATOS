@@ -353,14 +353,41 @@
             }
         }
 
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["relato_id"]) && isset($_POST["resposta"])) {
+          // Processamento do formulário de tratativa
+          if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["relato_id"]) && isset($_POST["resposta"])) {
             $relatoId = $_POST["relato_id"];
             $resposta = $_POST["resposta"];
-        
+
             if (!empty($resposta)) {
-                // Adiciona nova tratativa
-                $inserirTratativa = $pdo->prepare("INSERT INTO tratativas (relato_id, resposta) VALUES (?, ?)");
-                $inserirTratativa->execute([$relatoId, $resposta]);
+                // Verifique se a tratativa já existe antes de adicioná-la
+                $verificarTratativa = $pdo->prepare("SELECT COUNT(*) FROM tratativas WHERE relato_id = ? AND resposta = ?");
+                $verificarTratativa->execute([$relatoId, $resposta]);
+
+                if ($verificarTratativa->fetchColumn() == 0) {
+                    // Adiciona nova tratativa apenas se não existir uma tratativa idêntica
+                    try {
+                        $inserirTratativa = $pdo->prepare("INSERT INTO tratativas (relato_id, resposta) VALUES (?, ?)");
+                        $inserirTratativa->execute([$relatoId, $resposta]);
+
+                        // Limpa o formulário após o envio da tratativa
+                        echo "<script>";
+                        echo "document.getElementById('tratativaForm').reset();";
+                        echo "</script>";
+
+                        // Redireciona para a mesma página usando GET após o envio do formulário POST
+                        echo "<script>";
+                        echo "window.location.href = 'listar_relatos.php';";
+                        echo "</script>";
+                        
+                        // Interrompe a execução do script para evitar qualquer saída adicional
+                        exit();
+                    } catch (PDOException $e) {
+                        echo 'Erro ao adicionar tratativa: ' . $e->getMessage();
+                    }
+                } else {
+                    // Tratativa idêntica já existe, pode tratar essa situação conforme necessário
+                    echo "Tratativa idêntica já existe.";
+                }
             }
         }
 
@@ -437,7 +464,7 @@
                 $status = strtolower($status);  // Converta para minúsculas
                 switch ($status) {
                     case 'em aberto':
-                        return 'dot-red';
+                        return 'dot-green';
                     case 'em tratativa':
                         return 'dot-yellow';
                     case 'fechado':
@@ -472,9 +499,7 @@
                         $statusRelato = $relato['status'];
                     }
 
-                    var_dump($statusRelato);  // Adicione esta linha para depurar
-                    $dotClass = getStatusDotClass($statusRelato);
-                    var_dump($dotClass);  // Adicione esta linha também
+                    $dotClass = getStatusDotClass($statusRelato);             
 
                     echo "<hr>";
                     echo "<div style='position: relative;'>";
@@ -526,7 +551,7 @@
                     if ($tratativasStmt->rowCount() > 0) {
                         echo "<p><span class='respostaRelato'>Tratativas:</span></p>";
                         while ($tratativa = $tratativasStmt->fetch(PDO::FETCH_ASSOC)) {
-                            echo "<p>{$tratativa['resposta']} - {$tratativa['data_tratativa']}</p>";
+                            echo "<p>{$tratativa['data_tratativa']} - {$tratativa['resposta']}</p>";
                         }
                     }
 
@@ -536,44 +561,6 @@
                     echo "<textarea name=\"resposta\" placeholder=\"Insira a resposta ou faça a edição aqui\" required></textarea>";
                     echo "<button type=\"submit\">Enviar Tratativa</button>";
                     echo "</form>";
-
-                   // Processamento do formulário de tratativa
-                    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["relato_id"]) && isset($_POST["resposta"])) {
-                        $relatoId = $_POST["relato_id"];
-                        $resposta = $_POST["resposta"];
-
-                        if (!empty($resposta)) {
-                            // Verifique se a tratativa já existe antes de adicioná-la
-                            $verificarTratativa = $pdo->prepare("SELECT COUNT(*) FROM tratativas WHERE relato_id = ? AND resposta = ?");
-                            $verificarTratativa->execute([$relatoId, $resposta]);
-
-                            if ($verificarTratativa->fetchColumn() == 0) {
-                                // Adiciona nova tratativa apenas se não existir uma tratativa idêntica
-                                try {
-                                    $inserirTratativa = $pdo->prepare("INSERT INTO tratativas (relato_id, resposta) VALUES (?, ?)");
-                                    $inserirTratativa->execute([$relatoId, $resposta]);
-
-                                    // Limpa o formulário após o envio da tratativa
-                                    echo "<script>";
-                                    echo "document.getElementById('tratativaForm').reset();";
-                                    echo "</script>";
-
-                                    // Redireciona para a mesma página usando GET após o envio do formulário POST
-                                    echo "<script>";
-                                    echo "window.location.href = 'listar_relatos.php';";
-                                    echo "</script>";
-                                    
-                                    // Interrompe a execução do script para evitar qualquer saída adicional
-                                    exit();
-                                } catch (PDOException $e) {
-                                    echo 'Erro ao adicionar tratativa: ' . $e->getMessage();
-                                }
-                            } else {
-                                // Tratativa idêntica já existe, pode tratar essa situação conforme necessário
-                                echo "Tratativa idêntica já existe.";
-                            }
-                        }
-                    }
 
                     echo "<br>";
                         // Adiciona um menu suspenso para selecionar o estado

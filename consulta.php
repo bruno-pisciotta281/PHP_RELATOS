@@ -202,7 +202,7 @@ if (!isset($_SESSION["nivel_acesso"]) || $_SESSION["nivel_acesso"] !== "usuario_
                     if ($tratativasStmt->rowCount() > 0) {
                         echo "<p><span class='respostaRelato'>Tratativas:</span></p>";
                         while ($tratativa = $tratativasStmt->fetch(PDO::FETCH_ASSOC)) {
-                            echo "<p>{$tratativa['resposta']} - {$tratativa['data_tratativa']}</p>";
+                            echo "<p>{$tratativa['data_tratativa']} - {$tratativa['resposta']}</p>";
                         }
                     } else {
                         echo "<p class='red'>Nenhuma tratativa encontrada para este relato.</p>";
