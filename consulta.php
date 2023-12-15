@@ -1,6 +1,4 @@
 <?php
-// Inclua o arquivo de configuração
-include_once 'config.php';
 
 // Inicie a sessão (caso ainda não esteja iniciada)
 if (session_status() === PHP_SESSION_NONE) {
@@ -218,7 +216,6 @@ if (!isset($_SESSION["nivel_acesso"]) || $_SESSION["nivel_acesso"] !== "usuario_
             echo "<p>Nenhum ID de relato fornecido para consulta.</p>";
         }
 
-        // Função para obter a classe da bolinha com base no status
         function getStatusDotClass($status) {
             $status = strtolower($status);  // Converta para minúsculas
             switch ($status) {
@@ -227,6 +224,11 @@ if (!isset($_SESSION["nivel_acesso"]) || $_SESSION["nivel_acesso"] !== "usuario_
                 case 'em tratativa':
                     return 'dot-yellow';
                 case 'fechado':
+                case 'fechado':
+                    return 'dot-red';
+                case 'em_aberto':
+                    return 'dot-green';
+                case 'fechado':  
                     return 'dot-red';
                 default:
                     return 'dot-yellow'; // Se o status não coincidir com nenhum dos anteriores

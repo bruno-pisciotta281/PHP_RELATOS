@@ -105,15 +105,16 @@ session_start();
         button.logout-button {
             position: absolute;
             top: 10px;
-            left: 10px;
+            right: 10px;
             background-color: #00acc1;
         }
 
         /* Efeito de hover do botão de logout */
         button.logout-button:hover{
-            background-color: red;
-            color: white;
+            background-color: white;
+            color: #00acc1;
             transition: background-color 0.3s, color 0.3s;
+            border: #1d1d1d solid 2px;
         }
 
         /* Estilo do parágrafo secundário */
@@ -152,9 +153,7 @@ session_start();
 <body>  
     <div class="content-box">
     <?php
-   
-    echo '<button class="button-relatos" onclick="window.location.href = \'login_process.php\';"> RELATOS</button>';
-    echo '<button class="logout-button" onclick="window.location.href = \'logout.php\';">SAIR</button>';
+    echo '<button class="logout-button" onclick="window.location.href = \'login_process.php\';">RELATOS</button>';
     ?>
         <!-- Título principal -->
         <h1>NVT - RELATOS</h1>
