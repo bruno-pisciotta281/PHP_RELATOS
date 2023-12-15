@@ -285,61 +285,57 @@
             <form action="listar_relatos.php" method="GET">
                 <select class="filter-select" name="status">
                     <option value="">Todos</option>
-                    <option value="respondidos">Respondidos</option>
-                    <option value="nao_respondidos">Não Respondidos</option>
+                    <option value="em_aberto">Em Aberto</option>
+                    <option value="em_tratativa">Em Tratativa</option>
+                    <option value="fechado">Fechado</option>
                 </select>
                 <input class="filter-input" type="date" name="data" placeholder="Filtrar por data">
                 <button type="submit">Filtrar</button>
             </form>
-        </div>    
+        </div>
 
         <?php
-        // Inclua o arquivo de conexão
+       // Inclua o arquivo de conexão
         require 'db_connection.php';
 
         $status = isset($_GET['status']) ? $_GET['status'] : '';
         $data = isset($_GET['data']) ? $_GET['data'] : '';
 
-        $consultaQuery = "SELECT * FROM tabela_de_relatos";
-
-        $status = isset($_GET['status']) ? $_GET['status'] : '';
-        $data = isset($_GET['data']) ? $_GET['data'] : '';
-        $username = isset($_GET['username']) ? $_GET['username'] : ''; // Captura o nome de usuário
-
+        
         $consultaQuery = "SELECT * FROM tabela_de_relatos";
 
         $conditions = [];
-        $parameters = [];
-
-        if ($status == 'respondidos') {
-            $conditions[] = "resposta IS NOT NULL";
-        } elseif ($status == 'nao_respondidos') {
-            $conditions[] = "resposta IS NULL";
+        $values = [];
+        
+        // Adiciona condições conforme necessário
+        if (!empty($status)) {
+            // Ajuste para considerar a coluna 'status' da tabela
+            $conditions[] = "status = '$status'";
         }
-
+        
         if (!empty($data)) {
-            $formattedDate = date("Y-m-d", strtotime($data)); // Formata a data no formato do banco de dados
+            $formattedDate = date("Y-m-d", strtotime($data));
             $conditions[] = "DATE(data_criacao) = '$formattedDate'";
         }
-
+        
+        // Adiciona as condições à consulta, se houver alguma
         if (!empty($conditions)) {
             $consultaQuery .= " WHERE " . implode(" AND ", $conditions);
         }
-
-        $consultaQuery .= " ORDER BY data_criacao DESC";
-        $consultaStmt = $pdo->prepare($consultaQuery);
-        $consultaStmt->execute();
-
-        foreach ($parameters as $key => $value) {
-            if ($key == ':keyword_value') {
-                $consultaStmt->bindValue($key, $value, PDO::PARAM_STR);
-            } else {
-                $consultaStmt->bindValue($key, $value);
-            }
-        }
         
-        $consultaStmt->execute();
-
+        $consultaQuery .= " ORDER BY data_criacao DESC";
+        
+        try {
+            // Prepara a consulta
+            $consultaStmt = $pdo->prepare($consultaQuery);
+        
+            // Executa a consulta
+            $consultaStmt->execute();
+        } catch (PDOException $e) {
+            // Em caso de erro na execução da consulta
+            echo 'Erro ao consultar o banco de dados: ' . $e->getMessage();
+            exit();
+        }
         
         // Função para atualizar a resposta do relato
         function atualizarResposta($pdo, $relatoId, $resposta)
@@ -563,7 +559,7 @@
                     echo "</form>";
 
                     echo "<br>";
-                        // Adiciona um menu suspenso para selecionar o estado
+                        // Adiciona um menu suspenso para selecionar o status
                         echo "<div class ='select'>";
                         echo "<form id=\"tratativaForm\" action=\"\" method=\"POST\">";
                         echo "<input type=\"hidden\" name=\"relato_id\" value=\"$relatoId\">";

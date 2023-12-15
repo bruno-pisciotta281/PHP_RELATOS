@@ -1,3 +1,7 @@
+<?php
+// Inicie a sessão
+session_start();
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -148,9 +152,7 @@
 <body>  
     <div class="content-box">
     <?php
-    // index.php
-    // Incluir o arquivo de configuração
-    include_once 'config.php';
+   
     echo '<button class="button-relatos" onclick="window.location.href = \'login_process.php\';"> RELATOS</button>';
     echo '<button class="logout-button" onclick="window.location.href = \'logout.php\';">SAIR</button>';
     ?>

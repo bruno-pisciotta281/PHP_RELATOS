@@ -111,8 +111,6 @@
         <p>Olá, para você que é responsável pela tratativas dos relatos efetue seu login!</p>
         
         <?php
-
-            include_once 'config.php';
             echo '<button class="voltar-button" onclick="window.location.href = \'index.php\';">Voltar</button>';
             // Verifica se a URL contém o parâmetro "error" com valor igual a 1
             if (isset($_GET["error"]) && $_GET["error"] == 1) {
