@@ -120,10 +120,13 @@
 
         <form action="login_process.php" method="POST">
             <label for="email">Email:</label>
-            <input type="text" name="email" required>
+            <input type="text" name="email" value="<?php echo isset($_COOKIE['lembrar_email']) ? $_COOKIE['lembrar_email'] : ''; ?>" required>
             <br>
             <label for="senha">Senha:</label>
-            <input type="password" name="senha" required>
+            <input type="password" name="senha" value="<?php echo isset($_COOKIE['lembrar_senha']) ? $_COOKIE['lembrar_senha'] : ''; ?>" required>
+            <br>
+            <p style="text-align:center;">Lembrar Credenciais?</p>
+            <input type="checkbox" name="lembrar" <?php echo isset($_COOKIE['lembrar_email']) ? 'checked' : ''; ?>>
             <br>
             <button type="submit">Entrar</button>
         </form>

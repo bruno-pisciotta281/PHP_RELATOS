@@ -1,4 +1,14 @@
+<?php
+// Inicie a sessão
+session_start();
 
+// Verifica se o usuário está autenticado
+if (!isset($_SESSION['nivel_acesso']) || $_SESSION['nivel_acesso'] !== 'usuario_tratativa') {
+    // Redireciona para a página de login
+    header("Location: login.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -261,6 +271,18 @@
             background-color: orange;
         }
 
+        .green{
+            color: green;
+        }
+
+        .orange{
+            color: orange;
+        }
+
+        .red{
+            color: red;
+        }
+
        
 
     </style>
@@ -277,7 +299,7 @@
             <button onclick="window.location.href = 'index.php';">Página Inicial</button>
         </div>
         <h1>Lista de Relatos</h1>
-        <p>Esta página contém todos os relatos já efetuados por usuários, aqui você pode enviar tratativas únicas quanto a cada relato ou editar uma tratativa já efetuada. Também é possível excluir um relato caso ele já tenha sido totalmente efetuado clicando no botão <span class="px">X</span>. As bolinhas antes do identificador de ID representam se o Relato já recebeu uma tratativa, se a bolinha for <span class="green">verde</span> já houve resposta para o relato, se não a cor da bolinha será <span class="red">vermelha</span> e ainda há necessidade de tratar o respectivo Relato.</p>
+        <p>Esta página contém todos os relatos já efetuados por usuários, aqui você pode enviar múltiplas tratativas a cada Relato. Também é possível excluir um relato caso ele já tenha sido totalmente efetuado clicando no botão <span class="px">X</span>. Também é possível selecionar Status para os Relatos, <span class="green">Em Aberto</span> significado que não houve Tratativas para o Relato, <span class="orange">Em Tratativa</span> significa que este Relato já está em processo de solução e <span class="red">Fechado</span> indica que o Relato já foi solucionado.</p>
 
         <hr>
         <p class="filter">Filtros de Pesquisa</p>
@@ -507,6 +529,7 @@
                     echo "<p><span class='variable'>Nome do usuário:</span> $nomeUsuario</p>";
                     echo "<p><span class='variable'>Email do usuário:</span> $emailUsuario</p>";
                     echo "<p><span class='variable'>Data e Hora do relato:</span> $dataCriacao</p>";
+                    echo "<hr>";
 
                     // Processamento do formulário
                     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["relato_id"]) && isset($_POST["novo_status_$relatoId"])) {
