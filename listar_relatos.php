@@ -517,7 +517,7 @@ if (!isset($_SESSION['nivel_acesso']) || $_SESSION['nivel_acesso'] !== 'usuario_
                         $statusRelato = $relato['status'];
                     }
 
-                    $dotClass = getStatusDotClass($statusRelato);             
+                    $dotClass = getStatusDotClass($statusRelato);   
 
                     echo "<hr>";
                     echo "<div style='position: relative;'>";
@@ -529,7 +529,6 @@ if (!isset($_SESSION['nivel_acesso']) || $_SESSION['nivel_acesso'] !== 'usuario_
                     echo "<p><span class='variable'>Nome do usuário:</span> $nomeUsuario</p>";
                     echo "<p><span class='variable'>Email do usuário:</span> $emailUsuario</p>";
                     echo "<p><span class='variable'>Data e Hora do relato:</span> $dataCriacao</p>";
-                    echo "<hr>";
 
                     // Processamento do formulário
                     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["relato_id"]) && isset($_POST["novo_status_$relatoId"])) {
@@ -574,12 +573,14 @@ if (!isset($_SESSION['nivel_acesso']) || $_SESSION['nivel_acesso'] !== 'usuario_
                         }
                     }
 
-                    // Exibe o campo de resposta sempre
-                    echo "<form id=\"tratativaForm\" action=\"\" method=\"POST\">";
-                    echo "<input type=\"hidden\" name=\"relato_id\" value=\"$relatoId\">";
-                    echo "<textarea name=\"resposta\" placeholder=\"Insira a resposta ou faça a edição aqui\" required></textarea>";
-                    echo "<button type=\"submit\">Enviar Tratativa</button>";
-                    echo "</form>";
+                  // Exibe o campo de resposta apenas se o status não for "Fechado"
+                    if ($statusRelato != 'fechado') {
+                        echo "<form id=\"tratativaForm_$relatoId\" action=\"\" method=\"POST\">";
+                        echo "<input type=\"hidden\" name=\"relato_id\" value=\"$relatoId\">";
+                        echo "<textarea name=\"resposta\" placeholder=\"Insira a resposta ou faça a edição aqui\" required></textarea>";
+                        echo "<button type=\"submit\">Enviar Tratativa</button>";
+                        echo "</form>";
+                    }
 
                     echo "<br>";
                         // Adiciona um menu suspenso para selecionar o status
@@ -595,7 +596,7 @@ if (!isset($_SESSION['nivel_acesso']) || $_SESSION['nivel_acesso'] !== 'usuario_
                         echo "</form>";
                         echo "</div>";                       
                     echo "</div>";
-                    echo "<hr>";
+                    echo "<hr>";       
 
                 }
             } else {
