@@ -283,7 +283,16 @@ if (!isset($_SESSION['nivel_acesso']) || $_SESSION['nivel_acesso'] !== 'usuario_
             color: red;
         }
 
-       
+        select:required:invalid {
+        color: gray;
+        }
+        option[value=""][disabled] {
+        display: none;
+        }
+        option {
+        color: black;
+        }
+            
 
     </style>
 
@@ -588,6 +597,7 @@ if (!isset($_SESSION['nivel_acesso']) || $_SESSION['nivel_acesso'] !== 'usuario_
                         echo "<form id=\"tratativaForm\" action=\"\" method=\"POST\">";
                         echo "<input type=\"hidden\" name=\"relato_id\" value=\"$relatoId\">";
                         echo "<select name=\"novo_status_$relatoId\">";
+                        echo "<option value=\"\" disabled selected> STATUS </option>";
                         echo "<option value=\"em_aberto\" " . ($statusRelato == 'Em Aberto' ? 'selected' : '') . ">Em Aberto</option>";
                         echo "<option value=\"em_tratativa\" " . ($statusRelato == 'Em Tratativa' ? 'selected' : '') . ">Em Tratativa</option>";
                         echo "<option value=\"fechado\" " . ($statusRelato == 'Fechado' ? 'selected' : '') . ">Fechado</option>";
