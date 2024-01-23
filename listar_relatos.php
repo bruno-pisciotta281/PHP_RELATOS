@@ -316,8 +316,8 @@ if (!isset($_SESSION['nivel_acesso']) || $_SESSION['nivel_acesso'] !== 'usuario_
             <form action="listar_relatos.php" method="GET">
                 <select class="filter-select" name="status">
                     <option value="">Todos</option>
-                    <option value="em_aberto">Em Aberto</option>
-                    <option value="em_tratativa">Em Tratativa</option>
+                    <option value="Em Aberto">Em Aberto</option>
+                    <option value="em_tratativa">E  m Tratativa</option>
                     <option value="fechado">Fechado</option>
                 </select>
                 <input class="filter-input" type="date" name="data" placeholder="Filtrar por data">
