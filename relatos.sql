@@ -32,7 +32,7 @@ CREATE TABLE `tabela_de_relatos` (
   `nome` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `relato` text DEFAULT NULL,
-  `status` varchar(20) DEFAULT NULL,
+  `status` varchar(20) DEFAULT 'Em Aberto',
   `data_criacao` timestamp NOT NULL DEFAULT current_timestamp(),
   `resposta` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
