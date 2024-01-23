@@ -221,7 +221,7 @@ if (!isset($_SESSION["nivel_acesso"]) || $_SESSION["nivel_acesso"] !== "usuario_
             switch ($status) {
                 case 'em aberto':
                     return 'dot-green';
-                case 'em tratativa':
+                case 'em_tratativa':
                     return 'dot-yellow';
                 case 'fechado':
                 case 'fechado':
@@ -231,7 +231,7 @@ if (!isset($_SESSION["nivel_acesso"]) || $_SESSION["nivel_acesso"] !== "usuario_
                 case 'fechado':  
                     return 'dot-red';
                 default:
-                    return 'dot-yellow'; // Se o status não coincidir com nenhum dos anteriores
+                    return 'dot-green'; // Se o status não coincidir com nenhum dos anteriores
             }
         }
         ?>
